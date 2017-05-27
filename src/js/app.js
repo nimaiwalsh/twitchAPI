@@ -21,20 +21,22 @@ window.onload = function() {
         .all(streamByUser)
         .then((userStream) => {
             userStream.map((user) => {
-                if (user.name) {
-                    buildList(user.logo, user.name, 'User offline');
+                //If user is streaming display stream, or else display different user status
+                if (user.stream) {
+                    return buildList(user.stream.channel.logo, user.stream.channel.display_name, `${user.stream.channel.game} : ${user.stream.channel.status}`, 'online');
                 } else if (user.error) {
-                    buildList(user, user.error, user.message);
+                    const noUserLogo = './img-placeholder.png';
+                    return buildList(noUserLogo, user.error, user.message, 'no-user');
                 } else {
-                    buildList(user.stream.channel.logo, user.stream.channel.display_name, `${user.stream.channel.game} : ${user.stream.channel.status}`)
+                    return buildList(user.logo, user.name, 'Stream currently offline', 'offline');
                 }
             });
         });   
 
-    function buildList(logo, username, stream) {
+    function buildList(logo, username, stream, status) {
         let uL = document.getElementById("user-list");        
         let listItem = document.createElement("li");
-        listItem.className = "list-group-item";
+        listItem.className = `list-group-item ${status}`;
         listItem.innerHTML = `
             <div class="container">
             <div class="row">
@@ -44,7 +46,7 @@ window.onload = function() {
                 <div class="col-sm-8">
                     <div class="row">
                         <div class="col-sm-12 user-name-div">
-                            <p>${username}</p>
+                            <p><a href="https://www.twitch.tv/${username}" target="_blank">${username}</a></p>
                         </div>
                     </div>
                     <div class="row">
